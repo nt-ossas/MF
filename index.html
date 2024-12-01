@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Mio Negozio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        main {
+            display: flex;
+            justify-content: space-around;
+            padding: 2em;
+            flex-wrap: wrap;
+        }
+        section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 2em;
+            margin: 1em;
+            width: 45%;
+            max-width: 500px;
+        }
+        h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 1em;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.8em 1.5em;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .product {
+            margin-bottom: 1em;
+        }
+        .product h3 {
+            margin: 0.5em 0;
+        }
+        .product p {
+            font-size: 1.1em;
+            color: #555;
+        }
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 1em 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Benvenuto nel Mio Negozio</h1>
+    </header>
+    <main>
+        <section id="products">
+            <h2>Prodotti</h2>
+            <div id="product-list"></div>
+        </section>
+        <section id="cart">
+            <h2>Carrello</h2>
+            <div id="cart-list"></div>
+            <button onclick="submitOrder()">Invia Ordine</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Il Mio Negozio</p>
+    </footer>
+    <script>
+        let products = [
+            { id: 1, name: 'Cuffie 3', price: 27 },
+            { id: 2, name: 'Cuffie 2 Pro', price: 30 },
+            { id: 3, name: 'Cuffie 4', price: 33 }
+        ];
+
+        let cart = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            displayProducts();
+            displayCart();
+        });
+
+        function displayProducts() {
+            let productsContainer = document.getElementById('product-list');
+            productsContainer.innerHTML = '';
+            products.forEach(product => {
+                let productDiv = document.createElement('div');
+                productDiv.classList.add('product');
+                productDiv.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p>Prezzo: €${product.price} (spedizione rapida inclusa)</p>
+                    <button onclick="addToCart(${product.id})">Aggiungi al Carrello</button>
+                `;
+                productsContainer.appendChild(productDiv);
+            });
+        }
+
+        function addToCart(productId) {
+            let product = products.find(p => p.id === productId);
+            cart.push(product);
+            displayCart();
+        }
+
+        function displayCart() {
+            let cartContainer = document.getElementById('cart-list');
+            cartContainer.innerHTML = '';
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p>Il carrello è vuoto</p>';
+                return;
+            }
+            cart.forEach(product => {
+                let cartDiv = document.createElement('div');
+                cartDiv.innerHTML = `
+                    <p>${product.name} - €${product.price}</p>
+                `;
+                cartContainer.appendChild(cartDiv);
+            });
+        }
+
+        function submitOrder() {
+            let name = prompt('Inserisci il tuo nome:');
+            let surname = prompt('Inserisci il tuo cognome:');
+            let orderDetails = {
+                name: name,
+                surname: surname,
+                cart: cart
+            };
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', 'sendEmail.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert('Ordine inviato!');
+                }
+            };
+            xhr.send(JSON.stringify(orderDetails));
+            alert('Grazie per il tuo ordine, ' + name + ' ' + surname + '!');
+            cart = [];
+            displayCart();
+        }
+    </script>
+</body>
+</html>
